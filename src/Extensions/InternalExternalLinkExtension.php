@@ -6,6 +6,7 @@ use \Page;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\HeaderField;
 
 use SilverStripe\Forms\TreeDropdownField;
 
@@ -59,8 +60,9 @@ class InternalExternalLinkExtension extends DataExtension
     public function updateCMSFields(FieldList $fields)
     {
         $fields->addFieldsToTab(
-            'Root.Link',
+            'Root.Main',
             [
+                // HeaderField::create('Link-Details-Heading', 'Link ...', '2'),
                 OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues()),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
                 TextField::create('ExternalLink', 'External Link')
