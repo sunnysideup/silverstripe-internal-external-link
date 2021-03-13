@@ -2,9 +2,15 @@
 
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
-use SilverStripe\Forms\FieldList;
 use \Page;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\TextField;
 
+use SilverStripe\Forms\TreeDropdownField;
+
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\FieldType\DBField;
 
 class InternalExternalLinkExtension extends DataExtension
 {
@@ -57,9 +63,9 @@ class InternalExternalLinkExtension extends DataExtension
             [
                 OptionsetField::create('LinkType', 'Link Type', $this->dbObject('LinkType')->enumValues()),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
-                TextField::create('ExternalLink', 'External Link'),
+                TextField::create('ExternalLink', 'External Link')
+                    ->setDescription('Enter full URL, eg "https://google.com"'),
             ]
         );
-
     }
 }
