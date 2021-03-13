@@ -30,7 +30,7 @@ class InternalExternalLinkExtension extends DataExtension
      */
     public function MyLink($fieldNameAppendix = ''): ?string
     {
-        return $this->getMyLink($fieldNameAppendix);
+        return $this->owner->getMyLink($fieldNameAppendix);
     }
 
     /**
@@ -44,13 +44,13 @@ class InternalExternalLinkExtension extends DataExtension
         $internalLinkFieldName = 'InternalLink' . $fieldNameAppendix . 'ID';
         $InternalLinkMethodName = 'InternalLink' . $fieldNameAppendix;
         $externalLinkFieldName = 'ExternalLink' . $fieldNameAppendix;
-        if ($this->{$linkTypeFieldName} === 'Internal' && $this->{$internalLinkFieldName}) {
-            $obj = $this->{$InternalLinkMethodName}();
+        if ($this->owner->{$linkTypeFieldName} === 'Internal' && $this->owner->{$internalLinkFieldName}) {
+            $obj = $this->owner->{$InternalLinkMethodName}();
             if ($obj) {
                 return $obj->Link();
             }
-        } elseif ($this->{$linkTypeFieldName} === 'External' && $this->{$externalLinkFieldName}) {
-            return DBField::create_field('Varchar', $this->{$externalLinkFieldName})->url();
+        } elseif ($this->owner->{$linkTypeFieldName} === 'External' && $this->owner->{$externalLinkFieldName}) {
+            return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
         }
 
         return null;
@@ -61,7 +61,7 @@ class InternalExternalLinkExtension extends DataExtension
         $fields->addFieldsToTab(
             'Root.Link',
             [
-                OptionsetField::create('LinkType', 'Link Type', $this->dbObject('LinkType')->enumValues()),
+                OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues()),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
                 TextField::create('ExternalLink', 'External Link')
                     ->setDescription('Enter full URL, eg "https://google.com"'),
