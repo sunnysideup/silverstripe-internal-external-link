@@ -7,6 +7,8 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\Tab;
 
 use SilverStripe\Forms\TreeDropdownField;
 
@@ -59,15 +61,46 @@ class InternalExternalLinkExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        // $fields->insertBefore(new Tab('Links', 'Links'), 'Settings');
         $fields->addFieldsToTab(
-            'Root.Main',
+            'Root.Links',
             [
-                // HeaderField::create('Link-Details-Heading', 'Link ...', '2'),
-                OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues()),
+                HeaderField::create('Link-Details-Heading', 'Link'),
+                OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues())
+                    ->setAttribute('onchange', 'if(this.value ==="Internal")'),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
-                TextField::create('ExternalLink', 'External Link')
+                TextField::create('ExternalLink', 'External Link')->setAttribute('placeholder', 'e.g. https://www.rnz.co.nz')
                     ->setDescription('Enter full URL, eg "https://google.com"'),
+                $this->getLinksField('Main', 'Go back to Content Tab')
             ]
         );
+
+        $fields->addFieldToTab(
+            'Root.Main',
+            $this->getLinksField('Links', 'Add the Links in the Link Tab')
+        );
+    }
+
+    public function getLinksField(string $nameOfTab, string $label)
+    {
+        return LiteralField::create(
+            'LinkToLink'.$nameOfTab,
+            '<a href="#" onclick="'.$this->getJsFoTabSwitch($nameOfTab).'">'.$label.'</a>'
+        );
+    }
+    protected function getJsFoTabSwitch(string $nameOfTab) : string
+    {
+        $js = <<<js
+        if(jQuery(this).closest('div.element-editor__element').length > 0) {
+            jQuery(this)
+                .closest('div.element-editor__element')
+                .find('button[name=\'$nameOfTab\']')
+                .click();
+        } else {
+            jQuery('li[aria-controls=\'Root_$nameOfTab\'] a').click();
+        }
+        return false;
+js;
+        return $js;
     }
 }
