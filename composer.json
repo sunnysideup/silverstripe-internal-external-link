@@ -1,0 +1,36 @@
+{
+    "name": "sunnysideup/internal-external-link",
+    "type": "silverstripe-vendormodule",
+    "description": "Allows the addition of a link that can be internal or external",
+    "keywords": [
+        "Silverstripe-CMS",
+        "CMS",
+        "Silverstripe",
+        "link",
+        "internal",
+        "external",
+        "cms",
+        "redirection",
+        "links"
+    ],
+    "require": {
+        "silverstripe/framework": "^4.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Nicolaas Francken",
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Sunnysideup\\InternalExternalLink\\": "src/"
+        }
+    },
+    "suggested": {
+    }
+}
