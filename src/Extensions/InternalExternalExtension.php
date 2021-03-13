@@ -1,5 +1,8 @@
 <?php
 
+use SilverStripe\Forms\FieldList;
+
+
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
 class InternalExternalExtension extends DataExtension
@@ -44,5 +47,18 @@ class InternalExternalExtension extends DataExtension
         }
 
         return null;
+    }
+
+    public function updateCMSFields(FieldList $fields)
+    {
+        $fields->addFieldsToTab(
+            'Root.Link',
+            [
+                OptionsetField::create('LinkType', 'Link Type', $this->dbObject('LinkType')->enumValues()),
+                TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
+                TextField::create('ExternalLink', 'External Link'),
+            ]
+        );
+
     }
 }
