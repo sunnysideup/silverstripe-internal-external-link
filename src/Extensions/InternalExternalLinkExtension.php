@@ -61,46 +61,34 @@ class InternalExternalLinkExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
+        $js = <<<js
+            var el = this;
+            const val = jQuery(el).find('.form-check-input:checked').val();
+            if (val === 'Internal') {
+                jQuery('#Form_ItemEditForm_InternalLinkID_Holder').show();
+                jQuery('#Form_ItemEditForm_ExternalLink_Holder').hide();
+            } else if(val === 'External') {
+                jQuery('#Form_ItemEditForm_InternalLinkID_Holder').hide();
+                jQuery('#Form_ItemEditForm_ExternalLink_Holder').show();
+            } else {
+                jQuery('#Form_ItemEditForm_InternalLinkID_Holder').show();
+                jQuery('#Form_ItemEditForm_ExternalLink_Holder').show();
+            }
+
+js;
         // $fields->insertBefore(new Tab('Links', 'Links'), 'Settings');
         $fields->addFieldsToTab(
             'Root.Links',
             [
                 HeaderField::create('Link-Details-Heading', 'Link'),
                 OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues())
-                    ->setAttribute('onchange', 'if(this.value ==="Internal")'),
+                    ->setAttribute('onclick', $js),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
                 TextField::create('ExternalLink', 'External Link')->setAttribute('placeholder', 'e.g. https://www.rnz.co.nz')
                     ->setDescription('Enter full URL, eg "https://google.com"'),
-                $this->getLinksField('Main', 'Go back to Content Tab')
             ]
         );
 
-        $fields->addFieldToTab(
-            'Root.Main',
-            $this->getLinksField('Links', 'Add the Links in the Link Tab')
-        );
     }
 
-    public function getLinksField(string $nameOfTab, string $label)
-    {
-        return LiteralField::create(
-            'LinkToLink'.$nameOfTab,
-            '<a href="#" onclick="'.$this->getJsFoTabSwitch($nameOfTab).'">'.$label.'</a>'
-        );
-    }
-    protected function getJsFoTabSwitch(string $nameOfTab) : string
-    {
-        $js = <<<js
-        if(jQuery(this).closest('div.element-editor__element').length > 0) {
-            jQuery(this)
-                .closest('div.element-editor__element')
-                .find('button[name=\'$nameOfTab\']')
-                .click();
-        } else {
-            jQuery('li[aria-controls=\'Root_$nameOfTab\'] a').click();
-        }
-        return false;
-js;
-        return $js;
-    }
 }
