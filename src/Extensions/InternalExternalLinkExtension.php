@@ -1,11 +1,12 @@
 <?php
 
-use SilverStripe\Forms\FieldList;
-
-
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
-class InternalExternalExtension extends DataExtension
+use SilverStripe\Forms\FieldList;
+use \Page;
+
+
+class InternalExternalLinkExtension extends DataExtension
 {
     private static $db = [
         'LinkType' => "Enum('Internal,External', 'Internal')",
