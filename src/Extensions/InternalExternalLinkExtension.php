@@ -4,11 +4,10 @@ namespace Sunnysideup\InternalExternalLink\Extensions;
 
 use \Page;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\OptionsetField;
-use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HeaderField;
-use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TextField;
 
 use SilverStripe\Forms\TreeDropdownField;
 
@@ -88,7 +87,5 @@ js;
                     ->setDescription('Enter full URL, eg "https://google.com"'),
             ]
         );
-
     }
-
 }
