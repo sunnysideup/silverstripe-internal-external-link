@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
-use \Page;
+use Page;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
@@ -28,7 +28,6 @@ class InternalExternalLinkExtension extends DataExtension
     /**
      * use the $fieldNameAppendix if you have multiple fields
      * @param  string     $fieldNameAppendix - optional
-     * @return string|null
      */
     public function MyLink($fieldNameAppendix = ''): ?string
     {
@@ -38,7 +37,6 @@ class InternalExternalLinkExtension extends DataExtension
     /**
      * use the $fieldNameAppendix if you have multiple fields
      * @param  string     $fieldNameAppendix - optional
-     * @return string|null
      */
     public function getMyLink(?string $fieldNameAppendix = ''): ?string
     {
