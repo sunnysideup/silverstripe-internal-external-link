@@ -2,15 +2,13 @@
 
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
-use \Page;
+use Page;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
-
 use SilverStripe\Forms\TreeDropdownField;
-
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
 
@@ -26,9 +24,9 @@ class InternalExternalLinkExtension extends DataExtension
     ];
 
     /**
-     * use the $fieldNameAppendix if you have multiple fields
-     * @param  string     $fieldNameAppendix - optional
-     * @return string|null
+     * use the $fieldNameAppendix if you have multiple fields.
+     *
+     * @param string $fieldNameAppendix - optional
      */
     public function MyLink($fieldNameAppendix = ''): ?string
     {
@@ -36,9 +34,9 @@ class InternalExternalLinkExtension extends DataExtension
     }
 
     /**
-     * use the $fieldNameAppendix if you have multiple fields
-     * @param  string     $fieldNameAppendix - optional
-     * @return string|null
+     * use the $fieldNameAppendix if you have multiple fields.
+     *
+     * @param string $fieldNameAppendix - optional
      */
     public function getMyLink(?string $fieldNameAppendix = ''): ?string
     {
@@ -46,12 +44,12 @@ class InternalExternalLinkExtension extends DataExtension
         $internalLinkFieldName = 'InternalLink' . $fieldNameAppendix . 'ID';
         $InternalLinkMethodName = 'InternalLink' . $fieldNameAppendix;
         $externalLinkFieldName = 'ExternalLink' . $fieldNameAppendix;
-        if ($this->owner->{$linkTypeFieldName} === 'Internal' && $this->owner->{$internalLinkFieldName}) {
+        if ('Internal' === $this->owner->{$linkTypeFieldName} && $this->owner->{$internalLinkFieldName}) {
             $obj = $this->owner->{$InternalLinkMethodName}();
             if ($obj) {
                 return $obj->Link();
             }
-        } elseif ($this->owner->{$linkTypeFieldName} === 'External' && $this->owner->{$externalLinkFieldName}) {
+        } elseif ('External' === $this->owner->{$linkTypeFieldName} && $this->owner->{$externalLinkFieldName}) {
             return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
         }
 
@@ -60,7 +58,7 @@ class InternalExternalLinkExtension extends DataExtension
 
     public function updateCMSFields(FieldList $fields)
     {
-        $js = <<<js
+        $js = <<<'js'
             var el = this;
             const val = jQuery(el).find('.form-check-input:checked').val();
             if (val === 'Internal') {
