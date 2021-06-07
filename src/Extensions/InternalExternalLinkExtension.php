@@ -81,7 +81,8 @@ js;
             [
                 HeaderField::create('Link-Details-Heading', 'Link'),
                 OptionsetField::create('LinkType', 'Link Type', $this->owner->dbObject('LinkType')->enumValues())
-                    ->setAttribute('onclick', $js),
+                    ->setAttribute('onclick', $js)
+                    ->setAttribute('onchange', $js),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
                 TextField::create('ExternalLink', 'External Link')->setAttribute('placeholder', 'e.g. https://www.rnz.co.nz')
                     ->setDescription('Enter full URL, eg "https://google.com"'),
