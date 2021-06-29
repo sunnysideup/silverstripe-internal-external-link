@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
+use SilverStripe\AssetAdmin\Forms\UploadField;
 use Page;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
@@ -13,16 +14,18 @@ use SilverStripe\Forms\TreeDropdownField;
 
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Assets\File;
 
 class InternalExternalLinkExtension extends DataExtension
 {
     private static $db = [
-        'LinkType' => "Enum('Internal,External', 'Internal')",
+        'LinkType' => "Enum('Internal,External,DownloadFile', 'Internal')",
         'ExternalLink' => 'Varchar(255)',
     ];
 
     private static $has_one = [
         'InternalLink' => Page::class,
+        'DownloadFile' => File::class,
     ];
 
     /**
@@ -43,8 +46,13 @@ class InternalExternalLinkExtension extends DataExtension
     public function getMyLink(?string $fieldNameAppendix = ''): ?string
     {
         $linkTypeFieldName = 'LinkType' . $fieldNameAppendix;
-        $internalLinkFieldName = 'InternalLink' . $fieldNameAppendix . 'ID';
+
         $InternalLinkMethodName = 'InternalLink' . $fieldNameAppendix;
+        $internalLinkFieldName = $InternalLinkMethodName . 'ID';
+
+        $downloadLinkMethodName = 'DownloadFile' . $fieldNameAppendix;
+        $downloadLinkFieldName = $downloadLinkMethodName . 'ID';
+
         $externalLinkFieldName = 'ExternalLink' . $fieldNameAppendix;
         if ($this->owner->{$linkTypeFieldName} === 'Internal' && $this->owner->{$internalLinkFieldName}) {
             $obj = $this->owner->{$InternalLinkMethodName}();
@@ -53,6 +61,8 @@ class InternalExternalLinkExtension extends DataExtension
             }
         } elseif ($this->owner->{$linkTypeFieldName} === 'External' && $this->owner->{$externalLinkFieldName}) {
             return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
+        }elseif ($this->owner->{$linkTypeFieldName} === 'DownloadFile' && $this->owner->{$downloadLinkFieldName}) {
+            return DBField::create_field('Varchar', $this->owner->{$downloadLinkMethodName})->url();
         }
 
         return null;
@@ -66,12 +76,19 @@ class InternalExternalLinkExtension extends DataExtension
             if (val === 'Internal') {
                 jQuery('#Form_ItemEditForm_InternalLinkID_Holder').show();
                 jQuery('#Form_ItemEditForm_ExternalLink_Holder').hide();
+                jQuery('#Form_ItemEditForm_DownloadFile_Holder').hide();
             } else if(val === 'External') {
                 jQuery('#Form_ItemEditForm_InternalLinkID_Holder').hide();
                 jQuery('#Form_ItemEditForm_ExternalLink_Holder').show();
+                jQuery('#Form_ItemEditForm_DownloadFile_Holder').hide();
+            } else if(val === 'DownloadFile') {
+                jQuery('#Form_ItemEditForm_InternalLinkID_Holder').hide();
+                jQuery('#Form_ItemEditForm_ExternalLink_Holder').hide();
+                jQuery('#Form_ItemEditForm_DownloadFile_Holder').show();
             } else {
                 jQuery('#Form_ItemEditForm_InternalLinkID_Holder').show();
                 jQuery('#Form_ItemEditForm_ExternalLink_Holder').show();
+                jQuery('#Form_ItemEditForm_DownloadFile_Holder').show();
             }
 
 js;
@@ -84,8 +101,10 @@ js;
                     ->setAttribute('onclick', $js)
                     ->setAttribute('onchange', $js),
                 TreeDropdownField::create('InternalLinkID', 'Internal Link', Page::class),
-                TextField::create('ExternalLink', 'External Link')->setAttribute('placeholder', 'e.g. https://www.rnz.co.nz')
-                    ->setDescription('Enter full URL, eg "https://google.com"'),
+                UploadField::create(
+                    'DownloadFile',
+                    'Download File'
+                ),
             ]
         );
     }
