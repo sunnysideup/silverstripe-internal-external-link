@@ -28,6 +28,10 @@ class InternalExternalLinkExtension extends DataExtension
         'DownloadFile' => File::class,
     ];
 
+    private static $owns = [
+        'DownloadFile',
+    ];
+
     /**
      * use the $fieldNameAppendix if you have multiple fields
      * @param  string     $fieldNameAppendix - optional
@@ -62,7 +66,10 @@ class InternalExternalLinkExtension extends DataExtension
         } elseif ($this->owner->{$linkTypeFieldName} === 'External' && $this->owner->{$externalLinkFieldName}) {
             return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
         }elseif ($this->owner->{$linkTypeFieldName} === 'DownloadFile' && $this->owner->{$downloadLinkFieldName}) {
-            return DBField::create_field('Varchar', $this->owner->{$downloadLinkMethodName})->url();
+            $obj = $this->owner->{$downloadLinkMethodName}();
+            if ($obj) {
+                return $obj->Link();
+            }
         }
 
         return null;
