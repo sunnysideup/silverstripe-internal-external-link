@@ -100,7 +100,8 @@ class InternalExternalLinkExtension extends DataExtension
                     jQuery('#Form_ItemEditForm_DownloadFile{$appendix}_Holder').show();
                 }
 
-    js;
+js;
+
             // $fields->insertBefore(new Tab('Links', 'Links'), 'Settings');
             $fields->addFieldsToTab(
                 'Root.Links',
