@@ -6,6 +6,7 @@ use Page;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\Tab;
@@ -101,7 +102,12 @@ class InternalExternalLinkExtension extends DataExtension
                 }
 
 js;
-
+            $fields->removeByName([
+                'LinkType' . $appendix,
+                'InternalLink' . $appendix . 'ID',
+                'DownloadFile' . $appendix,
+                'ExternalLink'.$appendix,
+            ]);
             // $fields->insertBefore(new Tab('Links', 'Links'), 'Settings');
             $fields->addFieldsToTab(
                 'Root.Links',
@@ -121,6 +127,10 @@ js;
                         'InternalLink' . $appendix . 'ID',
                         'Internal Link ' . $appendix,
                         Page::class
+                    ),
+                    TextField::create(
+                        'ExternalLink'.$appendix,
+                        'External Link'
                     ),
                     UploadField::create(
                         'DownloadFile' . $appendix,
@@ -155,6 +165,9 @@ js;
             return $this->owner->getFieldNameAppendiciMore();
         }
 
-        return [];
+        // we need an empty string here ...
+        return [
+            ''
+        ];
     }
 }
