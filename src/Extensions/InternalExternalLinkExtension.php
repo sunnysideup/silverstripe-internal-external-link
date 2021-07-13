@@ -14,6 +14,8 @@ use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
 
+use SilverStripe\View\Requirements;
+
 class InternalExternalLinkExtension extends DataExtension
 {
     public static $casting = [
@@ -137,6 +139,15 @@ js;
                         'Download File ' . $appendix
                     ),
                 ]
+            );
+            Requirements::customScript(
+                'window.setTimeout(
+                    function() {
+                        jQuery(\'input[name="LinkType' . $appendix.'"]\').change();
+                    }
+                    , 500
+                )',
+                'InternalExternalLinkKickStart'.$appendix
             );
         }
     }
