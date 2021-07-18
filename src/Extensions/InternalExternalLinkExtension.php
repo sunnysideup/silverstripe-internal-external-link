@@ -6,14 +6,13 @@ use Page;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\Tab;
+use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
-
 use SilverStripe\View\Requirements;
 
 class InternalExternalLinkExtension extends DataExtension
@@ -108,7 +107,7 @@ js;
                 'LinkType' . $appendix,
                 'InternalLink' . $appendix . 'ID',
                 'DownloadFile' . $appendix,
-                'ExternalLink'.$appendix,
+                'ExternalLink' . $appendix,
             ]);
             // $fields->insertBefore(new Tab('Links', 'Links'), 'Settings');
             $fields->addFieldsToTab(
@@ -131,7 +130,7 @@ js;
                         Page::class
                     ),
                     TextField::create(
-                        'ExternalLink'.$appendix,
+                        'ExternalLink' . $appendix,
                         'External Link'
                     ),
                     UploadField::create(
@@ -143,11 +142,11 @@ js;
             Requirements::customScript(
                 'window.setTimeout(
                     function() {
-                        jQuery(\'input[name="LinkType' . $appendix.'"]\').change();
+                        jQuery(\'input[name="LinkType' . $appendix . '"]\').change();
                     }
                     , 500
                 )',
-                'InternalExternalLinkKickStart'.$appendix
+                'InternalExternalLinkKickStart' . $appendix
             );
         }
     }
@@ -178,7 +177,7 @@ js;
 
         // we need an empty string here ...
         return [
-            ''
+            '',
         ];
     }
 }
