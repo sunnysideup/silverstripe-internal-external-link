@@ -8,11 +8,14 @@ use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\FormScaffolder;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
+
+use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 
 class InternalExternalLinkExtension extends DataExtension
@@ -81,28 +84,49 @@ class InternalExternalLinkExtension extends DataExtension
     {
         $fieldNameAppendici = $this->getFieldNameAppendici();
         foreach ($fieldNameAppendici as $appendix) {
+            $linkTypeClass = 'LinkType' . $appendix . '_'.rand(0,999999);
+            $internalClass = 'InternalLink' . $appendix . 'ID_'.rand(0,999999);
+            $externalClass = 'ExternalLink' . $appendix . '_'.rand(0,999999);
+            $downloadFileClass = 'DownloadFile' . $appendix . '_'.rand(0,999999);
+
             $js = <<<js
                 var el = this;
-                const val = jQuery(el).find('.form-check-input:checked').val();
+                const val = jQuery('.{$linkTypeClass}').find('.form-check-input:checked').val();
+                const internaLinkHolder = jQuery('.{$internalClass}');
+                const externaLinkHolder = jQuery('.{$externalClass}');
+                const downloadLinkHolder = jQuery('.{$downloadFileClass}');
                 if (val === 'Internal') {
-                    jQuery('#Form_ItemEditForm_InternalLink{$appendix}ID_Holder').show();
-                    jQuery('#Form_ItemEditForm_ExternalLink{$appendix}_Holder').hide();
-                    jQuery('#Form_ItemEditForm_DownloadFile{$appendix}_Holder').hide();
+                    internaLinkHolder.show();
+                    externaLinkHolder.hide();
+                    downloadLinkHolder.hide();
                 } else if(val === 'External') {
-                    jQuery('#Form_ItemEditForm_InternalLink{$appendix}ID_Holder').hide();
-                    jQuery('#Form_ItemEditForm_ExternalLink{$appendix}_Holder').show();
-                    jQuery('#Form_ItemEditForm_DownloadFile{$appendix}_Holder').hide();
+                    internaLinkHolder.hide();
+                    externaLinkHolder.show();
+                    downloadLinkHolder.hide();
                 } else if(val === 'DownloadFile') {
-                    jQuery('#Form_ItemEditForm_InternalLink{$appendix}ID_Holder').hide();
-                    jQuery('#Form_ItemEditForm_ExternalLink{$appendix}_Holder').hide();
-                    jQuery('#Form_ItemEditForm_DownloadFile{$appendix}_Holder').show();
+                    internaLinkHolder.hide();
+                    externaLinkHolder.hide();
+                    downloadLinkHolder.show();
                 } else {
-                    jQuery('#Form_ItemEditForm_InternalLink{$appendix}ID_Holder').show();
-                    jQuery('#Form_ItemEditForm_ExternalLink{$appendix}_Holder').show();
-                    jQuery('#Form_ItemEditForm_DownloadFile{$appendix}_Holder').show();
+                    internaLinkHolder.show();
+                    externaLinkHolder.show();
+                    downloadLinkHolder.show();
                 }
 
 js;
+            Requirements::customScript('
+                const '.$linkTypeClass.'fx = function() {
+                    '.$js.'
+                }
+                jQuery(".'.$linkTypeClass.' input").on("change click", '.$linkTypeClass.'fx());
+                window.setTimeout(
+                    function() {
+                        '.$linkTypeClass.'fx();
+                    },
+                    500
+                )',
+                $linkTypeClass
+            );
             $fields->removeByName([
                 'LinkType' . $appendix,
                 'InternalLink' . $appendix . 'ID',
@@ -122,21 +146,25 @@ js;
                         'Link Type ' . $appendix,
                         $this->owner->dbObject('LinkType')->enumValues()
                     )
+                        ->setAttribute('onchange', $js)
                         ->setAttribute('onclick', $js)
-                        ->setAttribute('onchange', $js),
+                        ->addExtraClass($linkTypeClass),
                     TreeDropdownField::create(
                         'InternalLink' . $appendix . 'ID',
                         'Internal Link ' . $appendix,
                         Page::class
-                    ),
+                    )
+                        ->addExtraClass($internalClass),
                     TextField::create(
                         'ExternalLink' . $appendix,
                         'External Link'
-                    ),
+                    )
+                        ->addExtraClass($externalClass),
                     UploadField::create(
                         'DownloadFile' . $appendix,
                         'Download File ' . $appendix
-                    ),
+                    )
+                        ->addExtraClass($downloadFileClass),
                 ]
             );
             Requirements::customScript(
