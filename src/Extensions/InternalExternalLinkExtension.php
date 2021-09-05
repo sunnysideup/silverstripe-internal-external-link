@@ -3,6 +3,10 @@
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
 use Page;
+
+use Sunnysideup\EmailAddressDatabaseField\Model\Fieldtypes\EmailAddress;
+
+use Sunnysideup\PhoneField\Model\Fieldtypes\PhoneField;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
@@ -24,7 +28,7 @@ class InternalExternalLinkExtension extends DataExtension
         'MyLink' => 'Varchar',
     ];
     private static $db = [
-        'LinkType' => "Enum('Internal,External,DownloadFile', 'Internal')",
+        'LinkType' => "Enum('Internal,External,DownloadFile,Email,Phone', 'Internal')",
         'ExternalLink' => 'Varchar(255)',
     ];
 
@@ -68,12 +72,26 @@ class InternalExternalLinkExtension extends DataExtension
             if ($obj) {
                 return $obj->Link();
             }
-        } elseif ('External' === $this->owner->{$linkTypeFieldName} && $this->owner->{$externalLinkFieldName}) {
-            return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
         } elseif ('DownloadFile' === $this->owner->{$linkTypeFieldName} && $this->owner->{$downloadLinkFieldName}) {
             $obj = $this->owner->{$downloadLinkMethodName}();
             if ($obj) {
                 return $obj->Link();
+            }
+        } elseif ($this->owner->{$externalLinkFieldName}) {
+            if('External' === $this->owner->{$linkTypeFieldName}) {
+                return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
+            } elseif ('Email' === $this->owner->{$linkTypeFieldName} ) {
+                $val = $this->owner->{$externalLinkFieldName};
+                if(class_exists('Sunnysideup\\EmailAddressDatabaseField\\Model\\Fieldtypes\\EmailAddress')) {
+                    $val = DBField::create_field('EmailAddress', $val)->HiddenEmailAddress();
+                }
+                return 'mailto:'.$val;
+            } elseif ( 'Phone' === $this->owner->{$linkTypeFieldName}) {
+                $val = $this->owner->{$externalLinkFieldName};
+                if(class_exists('Sunnysideup\\PhoneField\\Model\\Fieldtypes\\PhoneField')) {
+                    $val = DBField::create_field('PhoneField', $this->owner->{$externalLinkFieldName})->IntlFormat()->Raw();
+                }
+                return 'callto:'.$val;
             }
         }
 
@@ -99,7 +117,7 @@ class InternalExternalLinkExtension extends DataExtension
                     internaLinkHolder.show();
                     externaLinkHolder.hide();
                     downloadLinkHolder.hide();
-                } else if(val === 'External') {
+                } else if(val === 'External' || val === 'Phone' || val === 'Email') {
                     internaLinkHolder.hide();
                     externaLinkHolder.show();
                     downloadLinkHolder.hide();
@@ -157,7 +175,7 @@ js;
                         ->addExtraClass($internalClass),
                     TextField::create(
                         'ExternalLink' . $appendix,
-                        'External Link'
+                        'External Link / Email / Phone'
                     )
                         ->addExtraClass($externalClass),
                     UploadField::create(
@@ -192,7 +210,7 @@ js;
                 $this->owner->{$linkTypeField} = 'External';
             }
             if ('External' === $this->owner->LinkType && $this->owner->{$internalLinkField} && ! $this->owner->{$externalLinkField}) {
-                $this->owner->LinkType = 'External';
+                $this->owner->{$linkTypeField} = 'Internal';
             }
         }
     }
