@@ -137,11 +137,11 @@ js;
                     '.$js.'
                 }
                 jQuery(".'.$linkTypeClass.' input").on("change click", '.$linkTypeClass.'fx());
-                window.setTimeout(
+                window.setInterval(
                     function() {
                         '.$linkTypeClass.'fx();
                     },
-                    500
+                    700
                 )',
                 $linkTypeClass
             );
