@@ -7,6 +7,8 @@ use Page;
 use Sunnysideup\EmailAddressDatabaseField\Model\Fieldtypes\EmailAddress;
 
 use Sunnysideup\PhoneField\Model\Fieldtypes\PhoneField;
+
+use Sunnysideup\InternalExternalLink\Extensions\InternalExternalLinkExtension;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
@@ -22,8 +24,11 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 
+use SilverStripe\Core\Config\Config;
+
 class InternalExternalLinkExtension extends DataExtension
 {
+
     public static $casting = [
         'MyLink' => 'Varchar',
     ];
@@ -83,7 +88,7 @@ class InternalExternalLinkExtension extends DataExtension
             } elseif ('Email' === $this->owner->{$linkTypeFieldName} ) {
                 $val = $this->owner->{$externalLinkFieldName};
                 if(class_exists('Sunnysideup\\EmailAddressDatabaseField\\Model\\Fieldtypes\\EmailAddress')) {
-                    $val = DBField::create_field('EmailAddress', $val)->HiddenEmailAddress();
+                    $val = DBField::create_field('EmailAddress', $val)->HiddenEmailAddress()->RAW();
                 }
                 return 'mailto:'.$val;
             } elseif ( 'Phone' === $this->owner->{$linkTypeFieldName}) {
@@ -159,6 +164,7 @@ js;
                         'Link-Details-Heading' . $appendix,
                         'Link'
                     ),
+
                     OptionsetField::create(
                         'LinkType' . $appendix,
                         'Link Type ' . $appendix,
@@ -167,17 +173,20 @@ js;
                         ->setAttribute('onchange', $js)
                         ->setAttribute('onclick', $js)
                         ->addExtraClass($linkTypeClass),
+
                     TreeDropdownField::create(
                         'InternalLink' . $appendix . 'ID',
                         'Internal Link ' . $appendix,
                         Page::class
                     )
                         ->addExtraClass($internalClass),
+
                     TextField::create(
                         'ExternalLink' . $appendix,
                         'External Link / Email / Phone'
                     )
                         ->addExtraClass($externalClass),
+
                     UploadField::create(
                         'DownloadFile' . $appendix,
                         'Download File ' . $appendix
@@ -197,23 +206,6 @@ js;
         }
     }
 
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        $fieldNameAppendici = $this->getFieldNameAppendici();
-        foreach ($fieldNameAppendici as $appendix) {
-            $linkTypeField = 'LinkType' . $appendix;
-            $internalLinkField = 'InternalLink' . $appendix . 'ID';
-            $externalLinkField = 'ExternalLink' . $appendix;
-
-            if ('Internal' === $this->owner->{$linkTypeField} && ! $this->owner->{$internalLinkField} && $this->owner->{$externalLinkField}) {
-                $this->owner->{$linkTypeField} = 'External';
-            }
-            if ('External' === $this->owner->LinkType && $this->owner->{$internalLinkField} && ! $this->owner->{$externalLinkField}) {
-                $this->owner->{$linkTypeField} = 'Internal';
-            }
-        }
-    }
 
     protected function getFieldNameAppendici(): array
     {
