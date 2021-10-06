@@ -3,32 +3,20 @@
 namespace Sunnysideup\InternalExternalLink\Extensions;
 
 use Page;
-
-use Sunnysideup\EmailAddressDatabaseField\Model\Fieldtypes\EmailAddress;
-
-use Sunnysideup\PhoneField\Model\Fieldtypes\PhoneField;
-
-use Sunnysideup\InternalExternalLink\Extensions\InternalExternalLinkExtension;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\File;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\Forms\FormScaffolder;
 use SilverStripe\Forms\Tab;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\FieldType\DBField;
-
-use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
-
-use SilverStripe\Core\Config\Config;
 
 class InternalExternalLinkExtension extends DataExtension
 {
-
     public static $casting = [
         'MyLink' => 'Varchar',
     ];
@@ -83,20 +71,24 @@ class InternalExternalLinkExtension extends DataExtension
                 return $obj->Link();
             }
         } elseif ($this->owner->{$externalLinkFieldName}) {
-            if('External' === $this->owner->{$linkTypeFieldName}) {
+            if ('External' === $this->owner->{$linkTypeFieldName}) {
                 return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
-            } elseif ('Email' === $this->owner->{$linkTypeFieldName} ) {
+            }
+            if ('Email' === $this->owner->{$linkTypeFieldName}) {
                 $val = $this->owner->{$externalLinkFieldName};
-                if(class_exists('Sunnysideup\\EmailAddressDatabaseField\\Model\\Fieldtypes\\EmailAddress')) {
+                if (class_exists('Sunnysideup\\EmailAddressDatabaseField\\Model\\Fieldtypes\\EmailAddress')) {
                     $val = DBField::create_field('EmailAddress', $val)->HiddenEmailAddress()->RAW();
                 }
-                return 'mailto:'.$val;
-            } elseif ( 'Phone' === $this->owner->{$linkTypeFieldName}) {
+
+                return 'mailto:' . $val;
+            }
+            if ('Phone' === $this->owner->{$linkTypeFieldName}) {
                 $val = $this->owner->{$externalLinkFieldName};
-                if(class_exists('Sunnysideup\\PhoneField\\Model\\Fieldtypes\\PhoneField')) {
+                if (class_exists('Sunnysideup\\PhoneField\\Model\\Fieldtypes\\PhoneField')) {
                     $val = DBField::create_field('PhoneField', $this->owner->{$externalLinkFieldName})->IntlFormat()->Raw();
                 }
-                return 'callto:'.$val;
+
+                return 'callto:' . $val;
             }
         }
 
@@ -107,10 +99,10 @@ class InternalExternalLinkExtension extends DataExtension
     {
         $fieldNameAppendici = $this->getFieldNameAppendici();
         foreach ($fieldNameAppendici as $appendix) {
-            $linkTypeClass = 'LinkType' . $appendix . '_'.rand(0,999999);
-            $internalClass = 'InternalLink' . $appendix . 'ID_'.rand(0,999999);
-            $externalClass = 'ExternalLink' . $appendix . '_'.rand(0,999999);
-            $downloadFileClass = 'DownloadFile' . $appendix . '_'.rand(0,999999);
+            $linkTypeClass = 'LinkType' . $appendix . '_' . rand(0, 999999);
+            $internalClass = 'InternalLink' . $appendix . 'ID_' . rand(0, 999999);
+            $externalClass = 'ExternalLink' . $appendix . '_' . rand(0, 999999);
+            $downloadFileClass = 'DownloadFile' . $appendix . '_' . rand(0, 999999);
 
             $js = <<<js
                 var el = this;
@@ -137,14 +129,15 @@ class InternalExternalLinkExtension extends DataExtension
                 }
 
 js;
-            Requirements::customScript('
-                const '.$linkTypeClass.'fx = function() {
-                    '.$js.'
+            Requirements::customScript(
+                '
+                const ' . $linkTypeClass . 'fx = function() {
+                    ' . $js . '
                 }
-                jQuery(".'.$linkTypeClass.' input").on("change click", '.$linkTypeClass.'fx());
+                jQuery(".' . $linkTypeClass . ' input").on("change click", ' . $linkTypeClass . 'fx());
                 window.setInterval(
                     function() {
-                        '.$linkTypeClass.'fx();
+                        ' . $linkTypeClass . 'fx();
                     },
                     700
                 )',
@@ -205,7 +198,6 @@ js;
             );
         }
     }
-
 
     protected function getFieldNameAppendici(): array
     {
