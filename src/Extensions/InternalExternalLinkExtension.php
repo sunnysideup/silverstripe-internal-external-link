@@ -20,6 +20,7 @@ class InternalExternalLinkExtension extends DataExtension
     public static $casting = [
         'MyLink' => 'Varchar',
     ];
+
     private static $db = [
         'LinkType' => "Enum('Internal,External,DownloadFile,Email,Phone', 'Internal')",
         'ExternalLink' => 'Varchar(255)',
@@ -74,17 +75,19 @@ class InternalExternalLinkExtension extends DataExtension
             if ('External' === $this->owner->{$linkTypeFieldName}) {
                 return DBField::create_field('Varchar', $this->owner->{$externalLinkFieldName})->url();
             }
+
             if ('Email' === $this->owner->{$linkTypeFieldName}) {
                 $val = $this->owner->{$externalLinkFieldName};
-                if (class_exists('Sunnysideup\\EmailAddressDatabaseField\\Model\\Fieldtypes\\EmailAddress')) {
+                if (class_exists(\Sunnysideup\EmailAddressDatabaseField\Model\Fieldtypes\EmailAddress::class)) {
                     $val = DBField::create_field('EmailAddress', $val)->HiddenEmailAddress()->RAW();
                 }
 
                 return 'mailto:' . $val;
             }
+
             if ('Phone' === $this->owner->{$linkTypeFieldName}) {
                 $val = $this->owner->{$externalLinkFieldName};
-                if (class_exists('Sunnysideup\\PhoneField\\Model\\Fieldtypes\\PhoneField')) {
+                if (class_exists(\Sunnysideup\PhoneField\Model\Fieldtypes\PhoneField::class)) {
                     $val = DBField::create_field('PhoneField', $this->owner->{$externalLinkFieldName})->IntlFormat()->Raw();
                 }
 
@@ -99,10 +102,10 @@ class InternalExternalLinkExtension extends DataExtension
     {
         $fieldNameAppendici = $this->getFieldNameAppendici();
         foreach ($fieldNameAppendici as $appendix) {
-            $linkTypeClass = 'LinkType' . $appendix . '_' . rand(0, 999999);
+            $linkTypeClass = 'LinkType' . $appendix . \_::class . rand(0, 999999);
             $internalClass = 'InternalLink' . $appendix . 'ID_' . rand(0, 999999);
-            $externalClass = 'ExternalLink' . $appendix . '_' . rand(0, 999999);
-            $downloadFileClass = 'DownloadFile' . $appendix . '_' . rand(0, 999999);
+            $externalClass = 'ExternalLink' . $appendix . \_::class . rand(0, 999999);
+            $downloadFileClass = 'DownloadFile' . $appendix . \_::class . rand(0, 999999);
 
             $js = <<<js
                 var el = this;
