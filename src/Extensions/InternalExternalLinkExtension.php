@@ -102,10 +102,10 @@ class InternalExternalLinkExtension extends DataExtension
     {
         $fieldNameAppendici = $this->getFieldNameAppendici();
         foreach ($fieldNameAppendici as $appendix) {
-            $linkTypeClass = 'LinkType' . $appendix . \_::class . rand(0, 999999);
+            $linkTypeClass = 'LinkType' . $appendix . '_' . rand(0, 999999);
             $internalClass = 'InternalLink' . $appendix . 'ID_' . rand(0, 999999);
-            $externalClass = 'ExternalLink' . $appendix . \_::class . rand(0, 999999);
-            $downloadFileClass = 'DownloadFile' . $appendix . \_::class . rand(0, 999999);
+            $externalClass = 'ExternalLink' . $appendix . '_' . rand(0, 999999);
+            $downloadFileClass = 'DownloadFile' . $appendix . '_' . rand(0, 999999);
 
             $js = <<<js
                 var el = this;
